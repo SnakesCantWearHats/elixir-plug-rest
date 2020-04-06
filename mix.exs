@@ -28,7 +28,6 @@ defmodule RestServer.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:poison, "~> 3.1"},
       {:bcrypt_elixir, "~> 2.2"},
-      {:elixir_uuid, "~> 1.2"},
       {:bolt_sips, "~> 2.0.5"},
       {:joken, "~> 2.0"},
       {:lettuce, "~> 0.1.0", only: :dev},
