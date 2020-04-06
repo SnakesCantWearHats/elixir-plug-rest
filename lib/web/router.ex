@@ -15,30 +15,42 @@ defmodule Router do
   end
 
   post "/register" do
-    %{"email" => email, "password" => password} = conn.body_params
-
-    if !email || !password, do: conn |> send_resp(400, Poison.encode!(%{error: "Bad request"}))
-
-    new_user = Login.Store.add_user(%{email: email, password: password})
-
-    case new_user do
-      %{error: message} -> conn |> send_resp(400, Poison.encode!(%{error: message}))
-      _ -> conn |> send_resp(200, Poison.encode!(%{success: true, message: "User created", user: new_user}))
+    case Login.Logic.register(conn) do
+      {:error, message} -> conn |> send_resp(400, Poison.encode!(%{error: message}))
+      response -> conn |> send_resp(200, Poison.encode!(response))
     end
   end
 
-  get "/user/:id" do
-      user = Login.Store.get_user_by_id(id)
-      case user do
-        :error -> conn |> send_resp(400, Poison.encode!(%{error: "User not found"}))
-        _ -> conn |> send_resp(200, Poison.encode!(%{success: true, message: "User found", user: user}))
-      end
+  get "/user" do
+    case Login.Logic.get_user(conn) do
+      {:error, message} -> conn |> send_resp(400, Poison.encode!(%{error: message}))
+      response -> conn |> send_resp(200, Poison.encode!(response))
+    end
   end
 
   get "/users" do
-    users = Login.Store.get_users()
-    conn |> send_resp(200, Poison.encode!(%{success: true, message: "", users: users}))
+    case Login.Logic.get_all_user(conn) do
+      {:error, message} -> conn |> send_resp(400, Poison.encode!(%{error: message}))
+      response -> conn |> send_resp(200, Poison.encode!(response))
+    end
   end
+
+  post "/login" do
+    case Login.Logic.login(conn) do
+      {:error, message} -> conn |> send_resp(400, Poison.encode!(%{error: message}))
+      response -> conn |> send_resp(200, Poison.encode!(response))
+    end
+  end
+
+  post "/secured_route" do
+    %{"token" => token} = conn.body_params
+
+    {:ok, claims} = Login.Token.verify_and_validate(token)
+
+    conn |> send_resp(200, Poison.encode!(claims))
+  end
+
+  forward "/tasks", to: Web.Tasks
 
   match _ do
     conn |> send_resp(404, Poison.encode!(%{ error: "No route found" }))

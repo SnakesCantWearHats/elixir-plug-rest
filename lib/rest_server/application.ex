@@ -10,7 +10,6 @@ defmodule RestServer.Application do
     children = [
       # Starts a worker by calling: RestServer.Worker.start_link(arg)
       # {RestServer.Worker, arg}
-      # {Bolt.Sips, Application.get_env(:bolt_sips, Bolt)},
       {Plug.Cowboy, scheme: :http, plug: RestServer, options: [port: 4000]}
     ]
 

@@ -7,6 +7,7 @@ RUN mix local.rebar --force
 
 COPY mix.exs ./mix.exs
 COPY lib ./lib
+COPY config ./config
 
 RUN mix deps.get
 RUN mix compile

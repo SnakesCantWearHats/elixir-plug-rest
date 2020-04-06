@@ -6,4 +6,8 @@ defmodule Login.Encryption do
     encrypted_password = Bcrypt.Base.hash_password(password, salt)
     encrypted_password
   end
+
+  def check_password(password, hashed_password) do
+    Bcrypt.verify_pass(password, hashed_password)
+  end
 end
